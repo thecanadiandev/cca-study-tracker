@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CCA – Foundations · Study Kit</title>
+<script>try{document.documentElement.dataset.theme=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}catch(e){document.documentElement.dataset.theme='light';}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..600;1,9..144,400..500&family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FBFAF7; --text:#1C1B18; --muted:#6F6C64; --faint:#A5A199;
+    --hair:#EAE8E1; --accent:#4C7A63; --accent-soft:#EAF1EC; --check-ink:#FBFAF7;
+    --track:#EAE8E1;
+    --serif:"Fraunces",Georgia,serif; --sans:"Hanken Grotesk",system-ui,sans-serif;
+  }
+  [data-theme="dark"]{
+    --bg:#181713; --text:#ECEAE2; --muted:#9C988D; --faint:#635F57;
+    --hair:#2C2A25; --accent:#84C5A2; --accent-soft:#21271F; --check-ink:#181713;
+    --track:#2C2A25;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--bg); color:var(--text); font-family:var(--sans);
+    line-height:1.5; -webkit-font-smoothing:antialiased;
+    padding:44px 22px 96px; transition:background .35s ease,color .35s ease;
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+  .wrap{max-width:720px;margin:0 auto}
+  a{color:inherit}
+
+  /* topbar */
+  .topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:34px}
+  h1{font-family:var(--serif);font-optical-sizing:auto;font-weight:500;
+     font-size:clamp(27px,6vw,40px);line-height:1.02;letter-spacing:-.01em;margin:0}
+  .sub{color:var(--muted);font-size:14px;margin:9px 0 0}
+  .ctrls{display:flex;gap:8px;flex:0 0 auto}
+  .ic{background:none;border:1px solid var(--hair);color:var(--muted);
+      font-family:var(--sans);font-size:13px;cursor:pointer;border-radius:999px;
+      height:34px;padding:0 13px;display:inline-flex;align-items:center;gap:6px;
+      transition:border-color .2s ease,color .2s ease}
+  .ic:hover{border-color:var(--accent);color:var(--text)}
+  .ic:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .ic svg{width:15px;height:15px}
+  [data-theme="light"] .moon{display:none}
+  [data-theme="dark"] .sun{display:none}
+
+  /* progress */
+  .prog{margin-bottom:12px}
+  .pnum{font-family:var(--serif);font-weight:500;font-optical-sizing:auto;
+        font-size:clamp(52px,15vw,78px);line-height:.85;letter-spacing:-.02em}
+  .pnum i{font-style:normal;font-size:.34em;color:var(--faint);margin-left:4px}
+  .pmeta{color:var(--muted);font-size:13.5px;margin-top:10px}
+  .track{height:3px;border-radius:99px;background:var(--track);margin-top:16px;overflow:hidden}
+  .fill{height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+
+  /* start here */
+  .start{margin:40px 0;padding:22px 0;border-top:1px solid var(--hair);border-bottom:1px solid var(--hair)}
+  .start h2{font-family:var(--serif);font-weight:500;font-size:17px;margin:0 0 15px}
+  .qgrid{display:grid;grid-template-columns:1fr 1fr;gap:11px 26px}
+  @media (max-width:520px){.qgrid{grid-template-columns:1fr}}
+  .qlink{display:flex;gap:11px;align-items:baseline;font-size:14px}
+  .qlink em{font-style:normal;color:var(--faint);font-size:12px;min-width:52px;flex:0 0 auto}
+  .qlink a{text-decoration:none;border-bottom:1px solid var(--hair);padding-bottom:1px;transition:border-color .2s ease}
+  .qlink a:hover{border-color:var(--accent)}
+
+  /* weeks */
+  .week{margin-top:38px}
+  .week-head{width:100%;text-align:left;cursor:pointer;background:none;border:none;
+    padding:0 0 4px;display:flex;align-items:baseline;gap:12px;color:inherit;font-family:var(--sans)}
+  .week-head:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:4px}
+  .wk-n{font-family:var(--serif);font-weight:500;font-size:19px;letter-spacing:-.01em}
+  .wk-focus{color:var(--muted);font-size:13px}
+  .wk-prog{margin-left:auto;font-size:12.5px;color:var(--faint);font-variant-numeric:tabular-nums}
+  .chev{color:var(--faint);flex:0 0 auto;transition:transform .2s ease;align-self:center}
+  .week.collapsed .chev{transform:rotate(-90deg)}
+  .week.collapsed .days{display:none}
+  .days{margin-top:6px}
+
+  .day{padding:22px 0;border-top:1px solid var(--hair)}
+  .day-head{display:flex;align-items:baseline;gap:11px;margin-bottom:13px;flex-wrap:wrap}
+  .dn{font-size:12px;color:var(--faint);font-variant-numeric:tabular-nums;flex:0 0 auto}
+  .dt{font-weight:600;font-size:15.5px}
+  .dh{margin-left:auto;font-size:12.5px;color:var(--faint);white-space:nowrap}
+
+  .task{display:flex;gap:12px;align-items:flex-start;padding:6px 0;cursor:pointer}
+  .box{flex:0 0 auto;width:18px;height:18px;margin-top:1px;border-radius:5px;
+       border:1.5px solid var(--faint);background:transparent;display:grid;place-items:center;
+       transition:background .15s ease,border-color .15s ease}
+  .box svg{width:11px;height:11px;stroke:var(--check-ink);stroke-width:3.2;fill:none;
+    stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:20;stroke-dashoffset:20;transition:stroke-dashoffset .18s ease}
+  .task input{position:absolute;opacity:0;width:0;height:0}
+  .task input:checked + .box{background:var(--accent);border-color:var(--accent)}
+  .task input:checked + .box svg{stroke-dashoffset:0}
+  .task input:focus-visible + .box{outline:2px solid var(--accent);outline-offset:2px}
+  .tlabel{font-size:14.5px}
+  .task input:checked ~ .tlabel{color:var(--faint);text-decoration:line-through;text-decoration-color:var(--hair)}
+
+  .mats{margin-top:14px;padding-left:30px}
+  .mat{display:flex;gap:12px;align-items:baseline;padding:3px 0;font-size:13.5px}
+  .mat em{font-style:normal;color:var(--faint);font-size:11.5px;min-width:50px;flex:0 0 auto}
+  .mat a{text-decoration:none;border-bottom:1px solid var(--hair);padding-bottom:1px;transition:border-color .2s ease}
+  .mat a:hover{border-color:var(--accent)}
+  .note{margin-top:11px;padding-left:30px;font-family:var(--serif);font-style:italic;font-weight:400;
+        font-size:13.5px;color:var(--muted);line-height:1.45}
+
+  .exam{margin-top:38px;padding-top:24px;border-top:2px solid var(--accent)}
+  .exam h3{font-family:var(--serif);font-weight:500;font-size:19px;margin:0 0 2px}
+  .exam p{margin:0 0 14px;color:var(--muted);font-size:13.5px}
+
+  .foot{margin-top:40px;text-align:center;font-size:12px;color:var(--faint);line-height:1.6}
+  .foot a{color:var(--muted)}
+  .loading{padding:40px 0;color:var(--muted);font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div>
+      <h1>Claude Certified Architect</h1>
+      <p class="sub">Foundations — your 3-week path to the exam</p>
+    </div>
+    <div class="ctrls">
+      <button class="ic" id="theme" type="button" aria-label="Toggle theme">
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+      <button class="ic" id="reset" type="button">Reset</button>
+    </div>
+  </div>
+
+  <div class="prog">
+    <div class="pnum"><span id="pct">0</span><i>%</i></div>
+    <div class="pmeta"><span id="count">0 of 0 complete</span> · 2–3 hrs a day</div>
+    <div class="track"><div class="fill" id="fill"></div></div>
+  </div>
+
+  <section class="start">
+    <h2>Start here</h2>
+    <div class="qgrid">
+      <div class="qlink"><em>Exam</em><a href="https://anthropic.skilljar.com/claude-certified-architect-foundations-access-request" target="_blank" rel="noopener">Official page + exam guide</a></div>
+      <div class="qlink"><em>Book</em><a href="https://www.pearsonvue.com/us/en/anthropic.html" target="_blank" rel="noopener">Register (Pearson VUE)</a></div>
+      <div class="qlink"><em>Learn</em><a href="https://anthropic.skilljar.com/" target="_blank" rel="noopener">Anthropic Academy catalog</a></div>
+      <div class="qlink"><em>Video</em><a href="https://www.youtube.com/watch?v=reDRM0tqhNs" target="_blank" rel="noopener">freeCodeCamp CCA-F (13h)</a></div>
+      <div class="qlink"><em>Docs</em><a href="https://platform.claude.com/docs/en/build-with-claude/overview" target="_blank" rel="noopener">Claude developer docs</a></div>
+      <div class="qlink"><em>Keys</em><a href="https://console.anthropic.com" target="_blank" rel="noopener">Anthropic Console</a></div>
+    </div>
+  </section>
+
+  <main id="app"><div class="loading">Loading your progress…</div></main>
+
+  <p class="foot">Progress and theme save automatically.<br>Confirm current fee &amp; policy on the <a href="https://anthropic.skilljar.com/claude-certified-architect-foundations-access-request" target="_blank" rel="noopener">official page</a> before booking.</p>
+</div>
+
+<script>
+const DATA = {
+  weeks: [
+    {
+      n:"Week one", title:"Foundations: platform & API", focus:"Get fluent before you get fancy",
+      days:[
+        { n:1, t:"Orient & baseline", hrs:"~2.5h · Setup",
+          tasks:[
+            "Download the official Exam Guide (PDF) and read it end to end",
+            "Take the 12 sample questions cold — note which domains feel weakest",
+            "Write the 5 domain weights where you'll see them: 27 / 20 / 20 / 18 / 15",
+            "Create an Anthropic Console account and generate an API key",
+          ],
+          res:[
+            ["official","Official CCA-F page — exam guide, terms, policies","https://anthropic.skilljar.com/claude-certified-architect-foundations-access-request"],
+            ["official","Pearson VUE — where you'll register later","https://www.pearsonvue.com/us/en/anthropic.html"],
+            ["docs","Anthropic Console — generate your API key","https://console.anthropic.com"],
+          ],
+          note:"The 12 sample questions in the guide are the single best signal for where to spend your hours." },
+        { n:2, t:"Claude Platform 101", hrs:"~2.5h · Platform",
+          tasks:[
+            "Complete “Claude Platform 101” on Anthropic Academy",
+            "Make your first Messages API call (curl or an SDK)",
+            "Send a multi-turn conversation and inspect the message structure",
+            "Note the model line-up and each model's context-window size",
+          ],
+          res:[
+            ["course","Claude Platform 101 (Anthropic Academy)","https://anthropic.skilljar.com/claude-platform-101"],
+            ["docs","API overview","https://platform.claude.com/docs/en/api/overview"],
+            ["docs","Models overview","https://platform.claude.com/docs/en/models/overview"],
+          ] },
+        { n:3, t:"Building with the Claude API · pt.1", hrs:"~2.5h · API",
+          tasks:[
+            "Start “Building with the Claude API”",
+            "Practice system prompts, temperature, and max_tokens",
+            "Get streaming responses working",
+            "Log stop_reason on every call and learn what each value means",
+          ],
+          res:[
+            ["course","Building with the Claude API (8+ hrs — the big one)","https://anthropic.skilljar.com/claude-with-the-anthropic-api"],
+            ["docs","Build with Claude — features overview","https://platform.claude.com/docs/en/build-with-claude/overview"],
+          ],
+          note:"This course is long; it spans Days 3–4 and threads into Day 7's tool use." },
+        { n:4, t:"Structured output & stop reasons", hrs:"~2.5h · API",
+          tasks:[
+            "Finish the API course sections on structured / JSON output",
+            "Force clean JSON and parse it programmatically",
+            "Compare end_turn vs tool_use vs max_tokens stop reasons",
+            "Handle a truncated (max_tokens) response gracefully",
+          ],
+          res:[
+            ["course","Building with the Claude API — structured outputs section","https://anthropic.skilljar.com/claude-with-the-anthropic-api"],
+            ["docs","Build with Claude — features overview","https://platform.claude.com/docs/en/build-with-claude/overview"],
+          ],
+          note:"tool_use vs end_turn shows up all over the exam — be able to explain why a loop stopped." },
+        { n:5, t:"Prompt engineering", hrs:"~2.5h · Prompting 20%",
+          tasks:[
+            "Work through the prompt-engineering best-practices guide",
+            "Practice XML-tag structuring, few-shot examples, chain-of-thought",
+            "Build a multi-pass draft → review → revise prompt loop",
+            "Add explicit error-handling instructions to a prompt",
+          ],
+          res:[
+            ["docs","Prompting best practices (official)","https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices"],
+            ["video","freeCodeCamp CCA-F prep — prompt-engineering chapters","https://www.youtube.com/watch?v=reDRM0tqhNs"],
+          ],
+          note:"Good day to start the freeCodeCamp video as an evening companion and let it run through Week 3." },
+        { n:6, t:"Context management & cost", hrs:"~2.5h · Context 15%",
+          tasks:[
+            "Learn prompt caching and when it actually pays off",
+            "Read a document into context and do simple RAG-style Q&A",
+            "Memorize token pricing per model, context sizes, and rate limits",
+            "Catch-up buffer — re-take the 12 sample questions",
+          ],
+          res:[
+            ["docs","Prompt caching","https://docs.claude.com/en/docs/build-with-claude/prompt-caching"],
+            ["docs","Models overview + pricing","https://platform.claude.com/docs/en/models/overview"],
+          ] },
+      ]
+    },
+    {
+      n:"Week two", title:"Tools, MCP & Claude Code", focus:"Where the exam lives",
+      days:[
+        { n:7, t:"Tool use fundamentals", hrs:"~2.5h · Tools & MCP 18%",
+          tasks:[
+            "Define a tool with a JSON schema and pass it to the model",
+            "Build the full loop: request → tool_use → run → return result → answer",
+            "Handle the tool_use stop reason correctly",
+            "Add a second tool and let the model choose between them",
+          ],
+          res:[
+            ["docs","Tool use overview + “Build a tool-using agent” tutorial","https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview"],
+            ["course","Building with the Claude API — tool use section","https://anthropic.skilljar.com/claude-with-the-anthropic-api"],
+          ] },
+        { n:8, t:"Introduction to MCP", hrs:"~2.5h · Tools & MCP 18%",
+          tasks:[
+            "Complete “Introduction to Model Context Protocol”",
+            "Diagram the client / server / transport architecture from memory",
+            "Understand how tools are exposed through an MCP server",
+            "Note how MCP differs from raw API tool use",
+          ],
+          res:[
+            ["course","Introduction to MCP — build servers & clients in Python","https://anthropic.skilljar.com/introduction-to-model-context-protocol"],
+            ["docs","MCP spec, SDKs & quickstart","https://modelcontextprotocol.io/"],
+          ],
+          note:"Learn MCP's three primitives cold: tools, resources, prompts." },
+        { n:9, t:"MCP hands-on", hrs:"~2.5h · Tools & MCP 18%",
+          tasks:[
+            "Connect an existing MCP server (e.g. filesystem) to a client",
+            "Expose one custom tool through your own MCP server",
+            "Trace a single call end to end through the server",
+            "Break it on purpose and read the error",
+          ],
+          res:[
+            ["course","MCP: advanced topics — transports, sampling, notifications","https://anthropic.skilljar.com/model-context-protocol-advanced-topics"],
+            ["docs","MCP quickstart","https://modelcontextprotocol.io/"],
+          ] },
+        { n:10, t:"Claude Code in Action", hrs:"~2.5h · Claude Code 20%",
+          tasks:[
+            "Install and authenticate Claude Code",
+            "Complete “Claude Code in Action”",
+            "Configure a project — settings and permissions",
+            "Add an MCP server to Claude Code",
+          ],
+          res:[
+            ["course","Claude Code in Action","https://anthropic.skilljar.com/claude-code-in-action"],
+            ["docs","Claude Code — overview & quickstart","https://code.claude.com/docs/en/overview"],
+            ["course","Claude Code 101 (skip if already comfortable)","https://anthropic.skilljar.com/claude-code-101"],
+          ] },
+        { n:11, t:"Claude Code workflows", hrs:"~2.5h · Claude Code 20%",
+          tasks:[
+            "Set up a hook — learn hook vs. system-prompt instruction",
+            "Use Claude Code to finish a small real task in a repo",
+            "Practice session management: fork vs. new session",
+            "Jot which workflow choices the exam is likely to test",
+          ],
+          res:[
+            ["docs","Claude Code overview — hooks, CLAUDE.md, skills, memory","https://code.claude.com/docs/en/overview"],
+            ["video","freeCodeCamp — Claude Code Essentials (Andrew Brown)","https://www.freecodecamp.org/news/claude-code-essentials/"],
+          ],
+          note:"“Hook vs. CLAUDE.md vs. subagent — which and when” is a classic exam framing." },
+        { n:12, t:"Cost & model tradeoffs", hrs:"~2.5h · Review",
+          tasks:[
+            "Learn the Batch API discount (≈50%) and when it's worth it",
+            "Pick Sonnet vs. Opus for 3 scenarios and justify each",
+            "Review all of Week 2 against the exam-guide task statements",
+            "Re-take the 12 sample questions — compare to Day 1",
+          ],
+          res:[
+            ["docs","API overview — Message Batches API (50% cost reduction)","https://platform.claude.com/docs/en/api/overview"],
+            ["docs","Models overview & pricing — batch + caching rates","https://platform.claude.com/docs/en/models/overview"],
+          ] },
+      ]
+    },
+    {
+      n:"Week three", title:"Agentic architecture & rehearsal", focus:"The capstone, then the dress rehearsal",
+      days:[
+        { n:13, t:"Agentic foundations", hrs:"~2.5h · Agentic 27%",
+          tasks:[
+            "Define agent vs. workflow vs. conversational system",
+            "Map the action loop: gather context → act → verify",
+            "List when agentic beats a simpler pattern — and when it doesn't",
+            "Start on the Claude Agent SDK material",
+          ],
+          res:[
+            ["video","freeCodeCamp CCA-F prep — agentic architecture chapters","https://www.youtube.com/watch?v=reDRM0tqhNs"],
+            ["course","Introduction to subagents (Anthropic Academy)","https://anthropic.skilljar.com/introduction-to-subagents"],
+          ],
+          note:"This domain is 27% and the furthest from your day-to-day — give it the most time." },
+        { n:14, t:"Orchestration", hrs:"~2.5h · Agentic 27%",
+          tasks:[
+            "Build an orchestrator + one subagent",
+            "Prove the subagent-context trap: pass findings explicitly, not by reference",
+            "Practice context isolation between agents",
+            "Handle a clean handoff between two agents",
+          ],
+          res:[
+            ["course","Introduction to subagents — context, delegation, anti-patterns","https://anthropic.skilljar.com/introduction-to-subagents"],
+            ["video","freeCodeCamp CCA-F prep — orchestration / hub-and-spoke","https://www.youtube.com/watch?v=reDRM0tqhNs"],
+          ],
+          note:"Subagents don't inherit the coordinator's context. “Analyze the findings” fails; “Analyze these findings: […]” works." },
+        { n:15, t:"Multi-agent topologies", hrs:"~2.5h · Agentic 27%",
+          tasks:[
+            "Compare hub-and-spoke, pipeline, and peer-to-peer",
+            "Build a small 2–3 step pipeline",
+            "Try sequential vs. parallel execution",
+            "Add replanning / ambiguity handling to one agent",
+          ],
+          res:[
+            ["video","freeCodeCamp CCA-F prep — multi-agent topologies","https://www.youtube.com/watch?v=reDRM0tqhNs"],
+            ["docs","Tool use overview — parallel tool use","https://platform.claude.com/docs/en/agents-and-tools/tool-use/overview"],
+          ] },
+        { n:16, t:"Full-domain review", hrs:"~2.5h · Review",
+          tasks:[
+            "Rate yourself red/yellow/green on every exam-guide task statement",
+            "Re-study every red item",
+            "Read the 6 exam scenario types; sketch an architecture for each",
+            "Consolidate notes into a one-page cheat sheet",
+          ],
+          res:[
+            ["official","Exam guide — full task statements per domain","https://anthropic.skilljar.com/claude-certified-architect-foundations-access-request"],
+          ],
+          note:"The exam pulls 4 of 6 fixed scenarios, 15 questions each. Pre-sketch all six." },
+        { n:17, t:"Timed mock exam", hrs:"~2.5h · Rehearsal",
+          tasks:[
+            "Take the official 60-question practice exam, strictly timed (120 min)",
+            "Score it; read every wrong answer and its “why wrong” note",
+            "Bucket your misses by domain",
+            "Re-study your single weakest domain tonight",
+          ],
+          res:[
+            ["official","Official practice exam (via the CCA-F / Academy page)","https://anthropic.skilljar.com/claude-certified-architect-foundations-access-request"],
+          ],
+          note:"Don't book the real exam until you clear ~900 here — a retake is another $125." },
+        { n:18, t:"Final pass & book it", hrs:"~2.5h · Launch",
+          tasks:[
+            "Second practice pass on weak spots — aim above 900/1000",
+            "Skim your one-page cheat sheet",
+            "Register via Anthropic → Pearson VUE and schedule the exam",
+            "Prep the setup: quiet room, ID, system check for online proctoring",
+          ],
+          res:[
+            ["official","Register & schedule (Pearson VUE)","https://www.pearsonvue.com/us/en/anthropic.html"],
+            ["official","CCA-F page — computer/network setup & policies","https://anthropic.skilljar.com/claude-certified-architect-foundations-access-request"],
+          ] },
+      ]
+    }
+  ],
+  exam:{ title:"Exam day", sub:"You've done the reps — now execute.",
+    tasks:[
+      "Sleep, hydrate, log in / arrive early",
+      "Read each scenario fully before touching its questions",
+      "Flag-and-return on anything over ~90 seconds",
+      "Trust the systems you actually built",
+    ] }
+};
+
+const KEY="cca-progress-v1", TKEY="cca-theme-v1";
+let state={};
+function idFor(w,d,i){return `w${w}d${d}t${i}`;}
+function wnum(w){return DATA.weeks.indexOf(w)+1;}
+
+// Works both inside Claude (window.storage) and on any web host (localStorage)
+const store={
+  async get(k){
+    if(typeof window!=="undefined"&&window.storage&&window.storage.get){try{const r=await window.storage.get(k);if(r)return r;}catch(e){}}
+    try{const v=localStorage.getItem(k);return v===null?null:{value:v};}catch(e){return null;}
+  },
+  async set(k,v){
+    if(typeof window!=="undefined"&&window.storage&&window.storage.set){try{await window.storage.set(k,v);}catch(e){}}
+    try{localStorage.setItem(k,v);}catch(e){}
+  }
+};
+async function load(){
+  try{const r=await store.get(KEY);state=r&&r.value?JSON.parse(r.value):{};}catch(e){state={};}
+  try{const t=await store.get(TKEY);if(t&&t.value)document.documentElement.dataset.theme=t.value;}catch(e){}
+  render();
+}
+async function saveState(){await store.set(KEY,JSON.stringify(state));}
+async function saveTheme(v){await store.set(TKEY,v);}
+
+function totals(){let total=0,done=0;DATA.weeks.forEach((w)=>w.days.forEach(d=>d.tasks.forEach((_,i)=>{total++;if(state[idFor(wnum(w),d.n,i)])done++;})));DATA.exam.tasks.forEach((_,i)=>{total++;if(state[`exd${i}`])done++;});return{total,done};}
+function weekDone(w){let t=0,d=0;w.days.forEach(day=>day.tasks.forEach((_,i)=>{t++;if(state[idFor(wnum(w),day.n,i)])d++;}));return{t,d};}
+function updateMeter(){const{total,done}=totals();const pct=total?Math.round(done/total*100):0;document.getElementById("pct").textContent=pct;document.getElementById("count").textContent=`${done} of ${total} complete`;document.getElementById("fill").style.width=pct+"%";document.querySelectorAll("[data-wprog]").forEach(el=>{const w=DATA.weeks[+el.dataset.wprog];const{t,d}=weekDone(w);el.textContent=`${d} / ${t}`;});}
+
+function taskRow(id,label,checked){const l=document.createElement("label");l.className="task";l.innerHTML=`<input type="checkbox" ${checked?"checked":""}><span class="box"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></span><span class="tlabel"></span>`;l.querySelector(".tlabel").textContent=label;const cb=l.querySelector("input");cb.addEventListener("change",()=>{if(cb.checked)state[id]=true;else delete state[id];saveState();updateMeter();});return l;}
+function matsBlock(res){const wrap=document.createElement("div");wrap.className="mats";res.forEach(([type,label,url])=>{const row=document.createElement("div");row.className="mat";const tt=type.charAt(0).toUpperCase()+type.slice(1);row.innerHTML=`<em>${tt}</em><a href="${url}" target="_blank" rel="noopener"></a>`;row.querySelector("a").textContent=label;wrap.appendChild(row);});return wrap;}
+
+function render(){
+  const app=document.getElementById("app");app.innerHTML="";
+  DATA.weeks.forEach((w,wi)=>{
+    const sec=document.createElement("section");sec.className="week";
+    const head=document.createElement("button");head.className="week-head";head.type="button";
+    head.innerHTML=`<span class="wk-n">${w.n}</span><span class="wk-focus">${w.title}</span><span class="wk-prog" data-wprog="${wi}">0 / 0</span><svg class="chev" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>`;
+    head.addEventListener("click",()=>sec.classList.toggle("collapsed"));
+    sec.appendChild(head);
+    const days=document.createElement("div");days.className="days";
+    w.days.forEach(d=>{
+      const card=document.createElement("div");card.className="day";
+      const top=document.createElement("div");top.className="day-head";
+      top.innerHTML=`<span class="dn">Day ${d.n}</span><span class="dt"></span><span class="dh">${d.hrs}</span>`;
+      top.querySelector(".dt").textContent=d.t;
+      card.appendChild(top);
+      d.tasks.forEach((tk,i)=>{const id=idFor(wi+1,d.n,i);card.appendChild(taskRow(id,tk,!!state[id]));});
+      if(d.res&&d.res.length)card.appendChild(matsBlock(d.res));
+      if(d.note){const n=document.createElement("div");n.className="note";n.textContent=d.note;card.appendChild(n);}
+      days.appendChild(card);
+    });
+    sec.appendChild(days);app.appendChild(sec);
+  });
+  const ex=document.createElement("section");ex.className="exam";
+  ex.innerHTML=`<h3>${DATA.exam.title}</h3><p>${DATA.exam.sub}</p>`;
+  DATA.exam.tasks.forEach((tk,i)=>ex.appendChild(taskRow(`exd${i}`,tk,!!state[`exd${i}`])));
+  app.appendChild(ex);
+  updateMeter();
+}
+
+document.getElementById("theme").addEventListener("click",()=>{const cur=document.documentElement.dataset.theme==="dark"?"light":"dark";document.documentElement.dataset.theme=cur;saveTheme(cur);});
+document.getElementById("reset").addEventListener("click",async()=>{if(!confirm("Clear all checked items and start over?"))return;state={};await saveState();render();});
+load();
+</script>
+</body>
+</html>
