@@ -101,6 +101,28 @@
         font-size:15px;color:var(--muted);line-height:1.5}
   .note::before{content:"// ";color:var(--faint);font-style:normal}
 
+  .watch .watch-body{margin-top:16px}
+  .week.collapsed .watch-body{display:none}
+  .player{position:relative;width:100%;aspect-ratio:16/9;border:1px solid var(--hair);border-radius:12px;overflow:hidden;background:#000}
+  .player iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+  .vlist{margin-top:14px;display:flex;flex-direction:column;gap:2px}
+  .vitem{display:flex;align-items:center;gap:13px;width:100%;text-align:left;background:none;border:none;color:inherit;font-family:var(--mono);cursor:pointer;padding:11px 12px;border-radius:10px;transition:background .15s ease}
+  .vitem:hover{background:var(--accent-soft)}
+  .vitem.active{background:var(--accent-soft)}
+  .vic{flex:0 0 auto;width:27px;height:27px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--hair);color:var(--muted)}
+  .vic svg{width:12px;height:12px;margin-left:1px}
+  .vitem.active .vic{background:var(--accent);border-color:var(--accent);color:var(--check-ink)}
+  .vtext{display:flex;flex-direction:column;gap:1px;min-width:0}
+  .vt{font-size:15px;font-weight:500}
+  .vitem.active .vt{color:var(--accent)}
+  .vmeta{font-size:12.5px;color:var(--faint)}
+  .vseen{flex:0 0 auto;margin-left:auto;width:18px;height:18px;color:var(--accent);opacity:0;transition:opacity .15s ease}
+  .vitem.seen .vseen{opacity:1}
+  .vseen svg{width:100%;height:100%}
+  .vcourses{margin-top:18px;padding-top:15px;border-top:1px solid var(--hair);font-size:13.5px;color:var(--muted);line-height:1.75}
+  .vc-h{color:var(--faint);display:block;margin-bottom:3px}
+  .vcourses a{border-bottom:1px solid var(--hair);text-decoration:none}
+  .vcourses a:hover{border-color:var(--accent)}
   .exam{margin-top:40px;padding-top:26px;border-top:2px solid var(--accent)}
   .exam h3{font-weight:600;font-size:22px;margin:0 0 4px;letter-spacing:-.01em}
   .exam p{margin:0 0 15px;color:var(--muted);font-size:14px}
@@ -141,6 +163,20 @@
       <div class="qlink"><em>Video</em><a href="https://www.youtube.com/watch?v=reDRM0tqhNs" target="_blank" rel="noopener">freeCodeCamp CCA-F (13h)</a></div>
       <div class="qlink"><em>Docs</em><a href="https://platform.claude.com/docs/en/build-with-claude/overview" target="_blank" rel="noopener">Claude developer docs</a></div>
       <div class="qlink"><em>Keys</em><a href="https://console.anthropic.com" target="_blank" rel="noopener">Anthropic Console</a></div>
+    </div>
+  </section>
+
+  <section class="week watch" id="watchSection">
+    <button class="week-head" id="watchToggle" type="button">
+      <span class="wk-n">Watch first</span>
+      <span class="wk-focus">get the hang of it before the guide</span>
+      <span class="wk-prog">4 videos</span>
+      <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+    <div class="watch-body">
+      <div class="player"><iframe id="player" src="" title="Tutorial video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen loading="lazy"></iframe></div>
+      <div class="vlist" id="vlist"></div>
+      <div class="vcourses"><span class="vc-h">Official course videos — open on Academy:</span><a href="https://anthropic.skilljar.com/claude-platform-101" target="_blank" rel="noopener">Platform 101</a> · <a href="https://anthropic.skilljar.com/claude-with-the-anthropic-api" target="_blank" rel="noopener">Building with the API</a> · <a href="https://anthropic.skilljar.com/introduction-to-model-context-protocol" target="_blank" rel="noopener">Intro to MCP</a> · <a href="https://anthropic.skilljar.com/claude-code-in-action" target="_blank" rel="noopener">Claude Code in Action</a></div>
     </div>
   </section>
 
@@ -406,6 +442,7 @@ async function load(){
   try{const r=await store.get(KEY);state=r&&r.value?JSON.parse(r.value):{};}catch(e){state={};}
   try{const t=await store.get(TKEY);if(t&&t.value)document.documentElement.dataset.theme=t.value;}catch(e){}
   render();
+  renderVideos();
 }
 async function saveState(){await store.set(KEY,JSON.stringify(state));}
 async function saveTheme(v){await store.set(TKEY,v);}
@@ -446,8 +483,39 @@ function render(){
   updateMeter();
 }
 
+const VIDEOS=[
+  {id:"7l6bXLAKyEI",title:"Claude Code Full Course",meta:"freeCodeCamp · ~1.5h · quickest warm-up"},
+  {id:"gh2_PhgZGsM",title:"Claude Code for Beginners",meta:"Full beginner course · the mental model"},
+  {id:"brLhhkUqcn4",title:"Claude Code Essentials",meta:"freeCodeCamp · ~12h · deep dive"},
+  {id:"reDRM0tqhNs",title:"CCA-F exam prep — every domain",meta:"freeCodeCamp · ~13h · the exam spine"},
+];
+let activeVid=null;
+function setVideo(id,play){
+  activeVid=id;
+  const f=document.getElementById("player");
+  if(f)f.src=`https://www.youtube-nocookie.com/embed/${id}?rel=0${play?"&autoplay=1":""}`;
+  if(play){state["vid:"+id]=true;saveState();}
+  document.querySelectorAll(".vitem").forEach(el=>{
+    el.classList.toggle("active",el.dataset.vid===id);
+    el.classList.toggle("seen",!!state["vid:"+el.dataset.vid]);
+  });
+}
+function renderVideos(){
+  const list=document.getElementById("vlist");if(!list)return;list.innerHTML="";
+  VIDEOS.forEach(v=>{
+    const b=document.createElement("button");b.className="vitem";b.type="button";b.dataset.vid=v.id;
+    if(state["vid:"+v.id])b.classList.add("seen");
+    b.innerHTML=`<span class="vic"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span><span class="vtext"><span class="vt"></span><span class="vmeta">${v.meta}</span></span><span class="vseen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg></span>`;
+    b.querySelector(".vt").textContent=v.title;
+    b.addEventListener("click",()=>setVideo(v.id,true));
+    list.appendChild(b);
+  });
+  setVideo(activeVid||VIDEOS[0].id,false);
+}
+(function(){const wt=document.getElementById("watchToggle");if(wt)wt.addEventListener("click",()=>document.getElementById("watchSection").classList.toggle("collapsed"));})();
+
 document.getElementById("theme").addEventListener("click",()=>{const cur=document.documentElement.dataset.theme==="dark"?"light":"dark";document.documentElement.dataset.theme=cur;saveTheme(cur);});
-document.getElementById("reset").addEventListener("click",async()=>{if(!confirm("Clear all checked items and start over?"))return;state={};await saveState();render();});
+document.getElementById("reset").addEventListener("click",async()=>{if(!confirm("Clear all checked items and start over?"))return;state={};await saveState();render();renderVideos();});
 load();
 </script>
 </body>
